@@ -2,8 +2,8 @@
 
 log4j()
 { 
-    echo "Scanning started for log4j jar" > /usr/local/qualys/cloud-agent/log4j_findings.stderr ;
-    date >> /usr/local/qualys/cloud-agent/log4j_findings.stderr;
+    echo "Scanning started for log4j jar" > /tmp/log4j_findings.stderr ;
+    date >> /tmp/log4j_findings.stderr;
     
     id=$(id);
     if ! (echo $id | grep "uid=0")>/dev/null;then 
@@ -16,7 +16,7 @@ log4j()
     isUnZip=$?;
     
     if [ "$isZip" -eq 0 ] && [ "$isUnZip" -eq 0 ];then 
-        jars=$(find / -xdev -name "*.jar" -type f ! -fstype nfs ! -fstype nfs4 ! -fstype cifs ! -fstype smbfs ! -fstype gfs ! -fstype gfs2 ! -fstype safenetfs ! -fstype secfs ! -fstype gpfs ! -fstype smb2 ! -fstype vxfs ! -fstype vxodmfs ! -fstype afs -print 2>/dev/null);
+        jars=$(find / -name "*.jar" -type f ! -fstype nfs ! -fstype nfs4 ! -fstype cifs ! -fstype smbfs ! -fstype gfs ! -fstype gfs2 ! -fstype safenetfs ! -fstype secfs ! -fstype gpfs ! -fstype smb2 ! -fstype vxfs ! -fstype vxodmfs ! -fstype afs -print 2>/dev/null);
         
         for i in $jars ;do 
             if zip -sf $i | grep "JndiLookup.class" >/dev/null;then 
@@ -64,17 +64,7 @@ log4j()
             fi;
         done;
     fi;
-    echo "Run status : Success" >> /usr/local/qualys/cloud-agent/log4j_findings.stderr;
+    echo "Run status : Success" >> /tmp/log4j_findings.stderr;
 };
 
-if [ ! -d "/usr/local/qualys/cloud-agent/" ]; then 
-    mkdir -p "/usr/local/qualys/cloud-agent/";
-    chmod 750 "/usr/local/qualys/cloud-agent/";
-fi; 
-
-if [ ! -f "/usr/local/qualys/cloud-agent/log4j_findings_disabled" ]; then 
-    log4j > /usr/local/qualys/cloud-agent/log4j_findings.stdout 2>/usr/local/qualys/cloud-agent/log4j_findings.stderr;
-else 
-    rm -rf /usr/local/qualys/cloud-agent/log4j_findings.stdout; 
-    echo "Flag is disabled, skipping command execution" > /usr/local/qualys/cloud-agent/log4j_findings.stderr;
-fi;
+log4j > /tmp/log4j_findings.stdout 2>/tmp/log4j_findings.stderr;
